@@ -1,15 +1,31 @@
+import 'package:fit/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../domain/workout.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(title: Text("Fit"), leading: Icon(Icons.fitness_center),),
+        appBar: AppBar(
+          title: Text("Fit"),
+          leading: Icon(Icons.fitness_center),
+          actions: <Widget>[
+            FlatButton.icon(
+              onPressed: () {
+                AuthService().logOut();
+              },
+              icon: Icon(
+                Icons.supervised_user_circle,
+                color: Colors.white,
+              ),
+              label: SizedBox.shrink()
+            )
+          ],
+        ),
         body: WorkoutsList(),
       ),
     );
@@ -17,20 +33,21 @@ class HomePage extends StatelessWidget {
 }
 
 class WorkoutsList extends StatelessWidget {
-
   final workouts = <Workout>[
     Workout(title: 'test', author: 'test', description: 'test', level: 'easy'),
-    Workout(title: 'test1', author: 'test1', description: 'test1', level: 'medium'),
-    Workout(title: 'test2', author: 'test2', description: 'test2', level: 'hard')
+    Workout(
+        title: 'test1', author: 'test1', description: 'test1', level: 'medium'),
+    Workout(
+        title: 'test2', author: 'test2', description: 'test2', level: 'hard')
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Container(
-        child: ListView.builder(
-          itemCount: 3,
-          itemBuilder: (context, index) {
+        child: Container(
+      child: ListView.builder(
+        itemCount: 3,
+        itemBuilder: (context, index) {
           return Card(
             elevation: 2.0,
             margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -40,27 +57,28 @@ class WorkoutsList extends StatelessWidget {
                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
                 leading: Container(
                   padding: EdgeInsets.only(right: 12),
-                  child: Icon(Icons.fitness_center, color: Colors.white,), 
-                  decoration: BoxDecoration(border: Border(right: BorderSide(width: 1, color: Colors.white24))),
-                ),
-                title: 
-                  Text(
-                    workouts[index].title, 
-                    style: 
-                      TextStyle(
-                        color: Theme.of(context).textTheme.title.color,
-                        fontWeight: FontWeight.bold
-                    ),
+                  child: Icon(
+                    Icons.fitness_center,
+                    color: Colors.white,
                   ),
+                  decoration: BoxDecoration(
+                      border: Border(
+                          right: BorderSide(width: 1, color: Colors.white24))),
+                ),
+                title: Text(
+                  workouts[index].title,
+                  style: TextStyle(
+                      color: Theme.of(context).textTheme.title.color,
+                      fontWeight: FontWeight.bold),
+                ),
                 trailing: Icon(Icons.keyboard_arrow_right, color: Colors.white),
                 subtitle: subtitle(context, workouts[index]),
               ),
             ),
           );
-         },
-        ),
-      )
-    );
+        },
+      ),
+    ));
   }
 }
 
@@ -93,10 +111,13 @@ Widget subtitle(BuildContext context, Workout workout) {
           valueColor: AlwaysStoppedAnimation(color),
         ),
       ),
-      SizedBox(width: 10,),
+      SizedBox(
+        width: 10,
+      ),
       Expanded(
         flex: 3,
-        child: Text(workout.level, style: TextStyle(color: Theme.of(context).textTheme.title.color)),
+        child: Text(workout.level,
+            style: TextStyle(color: Theme.of(context).textTheme.title.color)),
       )
     ],
   );
