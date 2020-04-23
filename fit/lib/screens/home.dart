@@ -1,17 +1,45 @@
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:fit/components/active-workout.dart';
+import 'package:fit/components/worlout-list.dart';
 import 'package:fit/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../domain/workout.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({Key key}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
 
   @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int sectionInteger = 0;
+  @override
   Widget build(BuildContext context) {
+    var curvedNavigationBar = CurvedNavigationBar(
+      items: const <Widget>[
+        Icon(Icons.fitness_center, size: 30),
+        Icon(Icons.search, size: 30),
+      ],
+      index: 0,
+      height: 60,
+      color: Colors.white.withOpacity(0.5),
+      buttonBackgroundColor: Colors.white,
+      backgroundColor: Colors.white.withOpacity(0.5),
+      animationCurve: Curves.easeInOut,
+      animationDuration: Duration(milliseconds: 500),
+      onTap: (int index) {
+        setState(() => sectionInteger = index);
+      },
+    );
+
     return Container(
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: Text("Fit"),
+          title: Text(
+            sectionInteger == 0 ? "Active Workout" : "Find Workouts"
+          ),
           leading: Icon(Icons.fitness_center),
           actions: <Widget>[
             FlatButton.icon(
@@ -26,59 +54,10 @@ class HomePage extends StatelessWidget {
             )
           ],
         ),
-        body: WorkoutsList(),
-      ),
+        body: sectionInteger == 0 ? ActiveWorkout() : WorkoutsList(),
+        bottomNavigationBar: curvedNavigationBar
+      )
     );
-  }
-}
-
-class WorkoutsList extends StatelessWidget {
-  final workouts = <Workout>[
-    Workout(title: 'test', author: 'test', description: 'test', level: 'easy'),
-    Workout(
-        title: 'test1', author: 'test1', description: 'test1', level: 'medium'),
-    Workout(
-        title: 'test2', author: 'test2', description: 'test2', level: 'hard')
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        child: Container(
-      child: ListView.builder(
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return Card(
-            elevation: 2.0,
-            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Container(
-              decoration: BoxDecoration(color: Color.fromRGBO(50, 65, 85, 0.9)),
-              child: ListTile(
-                contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                leading: Container(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(
-                    Icons.fitness_center,
-                    color: Colors.white,
-                  ),
-                  decoration: BoxDecoration(
-                      border: Border(
-                          right: BorderSide(width: 1, color: Colors.white24))),
-                ),
-                title: Text(
-                  workouts[index].title,
-                  style: TextStyle(
-                      color: Theme.of(context).textTheme.title.color,
-                      fontWeight: FontWeight.bold),
-                ),
-                trailing: Icon(Icons.keyboard_arrow_right, color: Colors.white),
-                subtitle: subtitle(context, workouts[index]),
-              ),
-            ),
-          );
-        },
-      ),
-    ));
   }
 }
 

@@ -13,6 +13,7 @@ class Fit extends StatelessWidget {
     return StreamProvider<User>.value(
       value: AuthService().currentUser,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: "Fit",
         theme: ThemeData(
           primaryColor: Color.fromRGBO(50, 65, 85, 1),
