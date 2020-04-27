@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:fit/components/active-workout.dart';
 import 'package:fit/components/worlout-list.dart';
+import 'package:fit/screens/add-workout.dart';
 import 'package:fit/services/auth.dart';
 import 'package:flutter/material.dart';
 import '../domain/workout.dart';
@@ -55,7 +56,15 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
         body: sectionInteger == 0 ? ActiveWorkout() : WorkoutsList(),
-        bottomNavigationBar: curvedNavigationBar
+        bottomNavigationBar: curvedNavigationBar,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Colors.white,
+          foregroundColor: Theme.of(context).primaryColor,
+          onPressed: (){
+            Navigator.push(context, MaterialPageRoute(builder: (ctx) => AddWorkout()));
+          },
+        ),
       )
     );
   }
