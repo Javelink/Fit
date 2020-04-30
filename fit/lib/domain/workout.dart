@@ -1,27 +1,69 @@
-class Workout {
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class Workout{
+  String uid;
+  String title;
+  String author;
+  String description;
+  String level;
+  bool isOnline;
+
+
+  Workout({this.uid, this.title, this.author, this.description, this.level});
+
+  Workout.fromJson(String uid, Map<String, dynamic> data) {
+      uid = uid;
+      title = data['title'];
+      author = data['author'];
+      description = data['description'];
+      level = data['level'];
+  }
+}
+
+class WorkoutSchedule{
+  String uid;
   String title;
   String author;
   String description;
   String level;
 
-  Workout({this.title, this.author, this.description, this.level});
-}
-
-
-class WorkoutSchedule{
   List<WorkoutWeek> weeks;
 
-  WorkoutSchedule({this.weeks});
+  WorkoutSchedule({this.uid, this.author, this.title, this.level, this.description, this.weeks});
 
   WorkoutSchedule copy(){
     var copiedWeeks = weeks.map((w) => w.copy()).toList();
     return WorkoutSchedule(weeks: copiedWeeks);
   }
+
+  Map<String, dynamic> toMap(){
+    return {
+      "title": title,
+      "description": description,
+      "level": level,
+      "author": author,
+      "weeks": weeks.map((w) => w.toMap()).toList()
+    };
+  }
+
+  Map<String, dynamic> toWorkoutMap(){
+    return {
+      "title": title,
+      "description": description,
+      "level": level,
+      "author": author,
+      "isOnline": true,
+      "createdOn": DateTime.now().millisecondsSinceEpoch
+    };
+  }
+
 }
 
 class WorkoutWeek{
   String notes;
   List<WorkoutWeekDay> days;
+
+  int get daysWithDrills => days != null ? days.where((d) => d.isSet).length : 0;
 
   WorkoutWeek({this.days, this.notes});
 
@@ -31,7 +73,12 @@ class WorkoutWeek{
     return WorkoutWeek(days: copiedDays, notes: notes);
   }
 
-  int get daysWithDrills => days != null ? days.where((d) => d.isSet).length : 0;
+  Map<String, dynamic> toMap(){
+    return {
+      "notes": notes,
+      "days": days.map((w) => w.toMap()).toList()
+    };
+  }
 }
 
 class WorkoutWeekDay{
@@ -47,6 +94,13 @@ class WorkoutWeekDay{
     var copiedBlocks = drillBlocks.map((w) => w.copy()).toList();
     return WorkoutWeekDay(notes: notes, drillBlocks: copiedBlocks);
   }
+
+  Map<String, dynamic> toMap(){
+    return {
+      "notes": notes,
+      "drillBlocks": drillBlocks.map((w) => w.toMap()).toList()
+    };
+  }
 }
 
 class WorkoutDrill {
@@ -59,6 +113,15 @@ class WorkoutDrill {
 
   WorkoutDrill copy(){
     return WorkoutDrill(title: title, weight: weight, sets: sets, reps: reps);
+  }
+
+  Map<String, dynamic> toMap(){
+    return {
+      "title": title,
+      "weight": weight,
+      "sets": sets,
+      "reps": reps
+    };
   }
 }
 
@@ -93,6 +156,18 @@ abstract class WorkoutDrillsBlock{
   }
 
   WorkoutDrillsBlock copy();
+  Map<String, dynamic> toMapParams();
+
+  Map<String, dynamic> toMap(){
+    var mainMap = {
+      "type": type.toString(),
+      "drills": drills.map((w) => w.toMap()).toList()
+    };
+
+    return {}..addAll(mainMap)..addAll(toMapParams());
+  }
+
+  
 
   List<WorkoutDrill> copyDrills(){
     return drills.map((w) => w.copy()).toList();
@@ -107,6 +182,10 @@ class WorkoutSingleDrillBlock extends WorkoutDrillsBlock
   WorkoutSingleDrillBlock copy(){
     return WorkoutSingleDrillBlock(copyDrills()[0]);
   }
+
+  Map<String, dynamic> toMapParams(){
+    return {};
+  }
 }
 
 class WorkoutMultisetDrillBlock extends WorkoutDrillsBlock
@@ -116,6 +195,10 @@ class WorkoutMultisetDrillBlock extends WorkoutDrillsBlock
 
   WorkoutMultisetDrillBlock copy(){
     return WorkoutMultisetDrillBlock(copyDrills());
+  }
+
+  Map<String, dynamic> toMapParams(){
+    return {};
   }
 }
 
@@ -128,6 +211,12 @@ class WorkoutAmrapDrillBlock extends WorkoutDrillsBlock
 
   WorkoutAmrapDrillBlock copy(){
     return WorkoutAmrapDrillBlock(minutes: minutes , drills: copyDrills());
+  }
+
+  Map<String, dynamic> toMapParams(){
+    return {
+      "minutes": minutes
+    };
   }
 }
 
@@ -143,6 +232,13 @@ class WorkoutForTimeDrillBlock extends WorkoutDrillsBlock
   WorkoutForTimeDrillBlock copy(){
     return WorkoutForTimeDrillBlock(timeCapMin: timeCapMin, rounds: rounds, restBetweenRoundsMin: restBetweenRoundsMin, drills: copyDrills());
   }
+  Map<String, dynamic> toMapParams(){
+    return {
+      "timeCapMin": timeCapMin,
+      "rounds": rounds,
+      "restBetweenRoundsMin": restBetweenRoundsMin
+    };
+  }
 }
 
 class WorkoutEmomDrillBlock extends WorkoutDrillsBlock
@@ -156,6 +252,13 @@ class WorkoutEmomDrillBlock extends WorkoutDrillsBlock
   WorkoutEmomDrillBlock copy(){
     return WorkoutEmomDrillBlock(timeCapMin: timeCapMin, intervalMin: intervalMin, drills: copyDrills());
   }
+
+  Map<String, dynamic> toMapParams(){
+    return {
+      "timeCapMin": timeCapMin,
+      "intervalMin": intervalMin
+    };
+  }
 }
 
 class WorkoutRestDrillBlock extends WorkoutDrillsBlock
@@ -167,5 +270,11 @@ class WorkoutRestDrillBlock extends WorkoutDrillsBlock
 
   WorkoutRestDrillBlock copy(){
     return WorkoutRestDrillBlock(timeMin: timeMin);
+  }
+
+  Map<String, dynamic> toMapParams(){
+    return {
+      "timeMin": timeMin,
+    };
   }
 }
